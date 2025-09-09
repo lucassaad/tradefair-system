@@ -32,12 +32,21 @@ It will allow organizers, exhibitors, and visitors to interact within a unified 
 
 ---
 
-## 📅 Next Steps
-- [ ] Define the data model  
-- [ ] Configure the FastAPI environment  
-- [ ] Create the first endpoints  
-- [ ] Implement initial test structure  
+## Database Schema (Initial Subset)
 
+### Entities
+- **User** (base entity)
+- **Role** (linked to User)
+- **Client** (specialization of user)
+- **Admin** (specialization of user)
+- **Exhibitor** (specialization of user)
+- **Product** (linked to exhibitor)
+- **Tradefair** (main event entity)
+
+### Intermediate Tables
+- **admins_tradefairs** → admins that manage a tradefair
+- **booth** → exhibitors that participate in a tradefair
+- **attendance** → clients that attend a tradefair
 ---
 
 ## 📄 License
