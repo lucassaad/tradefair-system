@@ -75,6 +75,7 @@ CREATE TABLE Booth
  booth_number INT NOT NULL,  
  exhibitor_id INT,  
  tradefair_id INT,
+ created_at DATE NOT NULL,
  CONSTRAINT fk_booth_exhibitor FOREIGN KEY (exhibitor_id) REFERENCES Exhibitor (id),
  CONSTRAINT fk_booth_tradefair FOREIGN KEY (tradefair_id) REFERENCES TradeFair (id)  
 ); 
