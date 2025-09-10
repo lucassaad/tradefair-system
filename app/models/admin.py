@@ -12,6 +12,6 @@ class Admin:
     user: Mapped["User"] = relationship("User", init=False)
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True, autoincrement=True)
-    contact_email: Mapped[str] = mapped_column(String(254))
+    contact_email: Mapped[str] = mapped_column(String(254), unique=True)
     user_id: Mapped[int] = mapped_column(ForeignKey(user.id), unique=True)
     managed_tradefairs_count: Mapped[int] = mapped_column(Integer, default=0)

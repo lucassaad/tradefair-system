@@ -15,8 +15,7 @@ class Attendance:
     client: Mapped["Client"] = relationship("Client")
     tradefair: Mapped["TradeFair"] = relationship("TradeFair")
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, init=False)
+    client_id: Mapped[int] = mapped_column(ForeignKey(client.id), primary_key=True)
+    trade_id: Mapped[int] = mapped_column(ForeignKey(tradefair.id), primary_key=True)
     status: Mapped[str] = mapped_column(String(100))
-    client_id: Mapped[int] = mapped_column(ForeignKey(client.id))
-    trade_id: Mapped[int] = mapped_column(ForeignKey(tradefair.id))
-    registration_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())

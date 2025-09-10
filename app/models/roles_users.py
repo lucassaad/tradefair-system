@@ -13,6 +13,5 @@ class Roles_Users:
     role: Mapped["Role"] = relationship("Role")
     user: Mapped["User"] = relationship("User")
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, init=False)
-    role_id: Mapped[int] = mapped_column(ForeignKey(role.id))
-    user_id: Mapped[int] = mapped_column(ForeignKey(user.id))
+    role_id: Mapped[int] = mapped_column(ForeignKey(role.id), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey(user.id), primary_key=True)

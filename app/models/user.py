@@ -12,7 +12,7 @@ class User():
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100))
-    phone: Mapped[str] = mapped_column(String(20))
+    phone_number: Mapped[str] = mapped_column(String(20))
     email: Mapped[str] = mapped_column(String(254), unique=True)
     password: Mapped[str] = mapped_column(String(255))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())

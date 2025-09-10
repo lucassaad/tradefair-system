@@ -15,8 +15,7 @@ class Booth:
     exhibitor: Mapped["Exhibitor"] = relationship("Exhibitor", init=False)
     tradefair: Mapped["TradeFair"] = relationship("TradeFair", init=False)
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, init=False)
+    exhibitor_id: Mapped[int] = mapped_column(ForeignKey(exhibitor.id), primary_key=True)
+    tradefair_id: Mapped[int] = mapped_column(ForeignKey(tradefair.id), primary_key=True)
     booth_number: Mapped[int] = mapped_column(Integer)
-    exhibitor_id: Mapped[int] = mapped_column(ForeignKey(exhibitor.id))
-    tradefair_id: Mapped[int] = mapped_column(ForeignKey(tradefair.id))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
