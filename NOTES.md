@@ -9,3 +9,10 @@ Mapeamento Objeto Relacional:
 - Funciona mapeando classes e propriedades de objetos para tavelas e colunas do banco de dados.
 ### SQLAchemy.orm
 - **.orm_registry**: maintains a set of classes that are mapped
+
+## Pydantic
+Data validation and settings management library for Python that leverages type hints to validate and serialize data schemas
+### BaseModel
+A base class for creating Pydantic models
+### Field
+- fornece metadados, validações adicionais e configurações para campos do modelo

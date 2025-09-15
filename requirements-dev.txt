@@ -1,2 +1,4 @@
 ruff
 SQLAlchemy
+pydantic
+pydantic-settings
