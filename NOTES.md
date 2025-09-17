@@ -16,3 +16,10 @@ Data validation and settings management library for Python that leverages type h
 A base class for creating Pydantic models
 ### Field
 - fornece metadados, validações adicionais e configurações para campos do modelo
+
+## Alembic 
+lightweight database migration tool for usage with the SQLAlchemy Database toolkit for Python
+
+### Migrations 
+- scripts que permitem gerenciar alterações no esquema de um banco de dados de forma sistemática e reprodutível 
+- forma de criar uma "linha do tempo" de modificações feitas em um banco de dados 
