@@ -3,8 +3,8 @@ from http import HTTPStatus
 
 from fastapi import APIRouter
 
-from app.models.user import User
-from app.schemas.user import UserIn, UserOut
+from api.models.user import User
+from api.schemas.user import UserIn, UserOut
 
 user_table = {}
 

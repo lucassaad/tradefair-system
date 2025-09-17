@@ -3,9 +3,9 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.exhibitor import Exhibitor
-from app.models.registry import table_registry
-from app.models.tradefair import TradeFair
+from api.models.exhibitor import Exhibitor
+from api.models.registry import table_registry
+from api.models.tradefair import TradeFair
 
 
 @table_registry.mapped_as_dataclass

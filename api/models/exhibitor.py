@@ -1,8 +1,8 @@
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.registry import table_registry
-from app.models.user import User
+from api.models.registry import table_registry
+from api.models.user import User
 
 
 @table_registry.mapped_as_dataclass
@@ -14,4 +14,4 @@ class Exhibitor:
     id: Mapped[int] = mapped_column(init=False, primary_key=True, autoincrement=True)
     contact_phone_number: Mapped[str] = mapped_column(String(20))
     contact_email: Mapped[str] = mapped_column(String(254))
-    user_id: Mapped[int] = mapped_column(ForeignKey(user.id), unique=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("User.id"), unique=True)

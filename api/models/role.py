@@ -1,7 +1,7 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.registry import table_registry
+from api.models.registry import table_registry
 
 
 @table_registry.mapped_as_dataclass

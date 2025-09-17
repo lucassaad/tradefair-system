@@ -1,9 +1,9 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.registry import table_registry
-from app.models.role import Role
-from app.models.user import User
+from api.models.registry import table_registry
+from api.models.role import Role
+from api.models.user import User
 
 
 @table_registry.mapped_as_dataclass
