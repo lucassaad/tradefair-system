@@ -3,9 +3,9 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from api.models.client import Client
-from api.models.registry import table_registry
-from api.models.tradefair import TradeFair
+from app.api.models.client import Client
+from app.api.models.registry import table_registry
+from app.api.models.tradefair import TradeFair
 
 @table_registry.mapped_as_dataclass
 class Attendance:

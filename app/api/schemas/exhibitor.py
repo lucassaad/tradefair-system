@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from api.schemas.user import UserOut
+from app.api.schemas.user import UserOut
 
 
 class ExhibitorBase(BaseModel):

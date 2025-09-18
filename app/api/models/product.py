@@ -4,8 +4,8 @@ from decimal import Decimal
 from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from api.models.exhibitor import Exhibitor
-from api.models.registry import table_registry
+from app.api.models.exhibitor import Exhibitor
+from app.api.models.registry import table_registry
 
 
 @table_registry.mapped_as_dataclass

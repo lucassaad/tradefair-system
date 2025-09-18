@@ -1,17 +1,16 @@
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from api.models.registry import table_registry
-from api.models.user import User
+from app.api.models.registry import table_registry
+from app.api.models.user import User
 
 
 @table_registry.mapped_as_dataclass
-class Admin:
-    __tablename__ = "Admin"
+class Client:
+    __tablename__ = "Client"
 
     user: Mapped["User"] = relationship("User", init=False)
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True, autoincrement=True)
-    contact_email: Mapped[str] = mapped_column(String(254), unique=True)
     user_id: Mapped[int] = mapped_column(ForeignKey(user.id), unique=True)
-    managed_tradefairs_count: Mapped[int] = mapped_column(Integer, default=0)
+    attended_tradefairs: Mapped[int] = mapped_column(Integer, default=0)

@@ -1,10 +1,11 @@
 from datetime import datetime
 from http import HTTPStatus
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from api.models.user import User
-from api.schemas.user import UserIn, UserOut
+from app.api.connection import Session, get_session
+from app.api.models.user import User
+from app.api.schemas.user import UserIn, UserOut
 
 user_table = {}
 
@@ -12,7 +13,7 @@ router = APIRouter(tags=["User"])
 
 
 @router.post("/api/v1/user", status_code=HTTPStatus.CREATED, response_model=UserOut)
-def create_user(user_in: UserIn):
+def create_user(user_in: UserIn, session: Session = Depends(get_session)):
     user = User(
         name=user_in.name,
         phone_number=user_in.phone_number,
