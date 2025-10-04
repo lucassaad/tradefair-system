@@ -1,0 +1,67 @@
+[project]
+name = "tradefair-system"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Lucas Saad",email = "lucassaadro@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13,<4.0"
+dependencies = [
+    "sqlalchemy (>=2.0.43,<3.0.0)",
+    "psycopg2 (>=2.9.10,<3.0.0)",
+    "pydantic (>=2.11.9,<3.0.0)",
+    "pydantic-settings (>=2.11.0,<3.0.0)",
+    "fastapi[standard] (>=0.118.0,<0.119.0)"
+]
+
+[tool.poetry]
+packages = [{include = "tradefair_system", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "alembic (>=1.16.5,<2.0.0)",
+    "ruff (>=0.13.2,<0.14.0)",
+    "taskipy (>=1.14.1,<2.0.0)"
+]
+test = [
+    "pytest (>=8.4.2,<9.0.0)",
+    "pytest-cov (>=7.0.0,<8.0.0)"
+]
+
+
+[tool.ruff]
+line-length = 79
+extend-exclude = ['migrations']
+
+[tool.ruff.lint]
+preview = true
+select = ['I', 'F', 'E', 'W', 'PL', 'PT']
+
+[tool.ruff.format]
+preview = true
+quote-style = 'single'
+
+[tool.pytest.ini_options]
+pythonpath = "."
+addopts = ['-p no:warnings', '--cov-report=term-missing']
+
+[tool.coverage.run]
+source = ['tradefair_system']
+omit = [
+    'tradefair_system/settings.py'
+]
+
+
+[tool.taskipy.tasks]
+lint = 'ruff check'
+pre_format = 'ruff check --fix'
+format = 'ruff format'
+run = 'fastapi dev tradefair_system/app.py'
+pre_test = 'task lint'
+test = 'pytest -s -x --cov=tradefair_system -vv'
+post_test = 'coverage html'
