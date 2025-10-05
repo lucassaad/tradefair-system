@@ -8,7 +8,7 @@ def test_post_user(client):
             'name': 'lucas',
             'phone_number': '61991052451',
             'email': 'lucassaadro@gmail.com',
-            'password': 'senha',
+            'password': 'senha'
         },
     )
 
@@ -24,7 +24,7 @@ def test_post_user(client):
     assert response_data == {
         'name': 'lucas',
         'phone_number': '61991052451',
-        'email': 'lucassaadro@gmail.com',
+        'email': 'lucassaadro@gmail.com'
     }
 
 
@@ -45,7 +45,7 @@ def test_get_all_users(client):
             {
                 'name': 'lucas',
                 'phone_number': '61991052451',
-                'email': 'lucassaadro@gmail.com',
+                'email': 'lucassaadro@gmail.com'
             }
         ]
     }
@@ -59,7 +59,7 @@ def test_put_user_by_id(client):
             'phone_number': '61991052451',
             'email': 'lucassaadro@gmail.com',
             'password': 'senha'
-        }
+        },
     )
     response_data = response.json()
 
@@ -69,7 +69,7 @@ def test_put_user_by_id(client):
     assert response_data == {
         'name': 'saad',
         'phone_number': '61991052451',
-        'email': 'lucassaadro@gmail.com',
+        'email': 'lucassaadro@gmail.com'
     }
 
 
@@ -81,25 +81,19 @@ def test_put_user_by_id_fail(client):
             'phone_number': '61991052451',
             'email': 'lucassaadro@gmail.com',
             'password': 'senha'
-        }
+        },
     )
 
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_delete_user_by_id(client):
-    response = client.delete(
-        '/users/0'
-    )
+    response = client.delete('/users/0')
 
     assert response.status_code == HTTPStatus.OK
-    assert response.json() == {
-        'message': 'User deleted'
-    }
+    assert response.json() == {'message': 'User deleted'}
 
 
 def test_delete_user_by_id_fail(client):
-    response = client.delete(
-    '/users/999'
-    )
+    response = client.delete('/users/999')
     assert response.status_code == HTTPStatus.NOT_FOUND

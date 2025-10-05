@@ -40,7 +40,8 @@ def put_user_by_id(user_id: int, user_in: UserIn):
             status_code=HTTPStatus.NOT_FOUND, detail='User not found'
         )
 
-    user = User(**user_in.model_dump())
+    user_create_time = database[user_id].created_at
+    user = User(**user_in.model_dump(), created_at=user_create_time)
     user.id = user_id
 
     database[user.id] = user
@@ -49,13 +50,12 @@ def put_user_by_id(user_id: int, user_in: UserIn):
 
 
 @router.delete(
-        '/users/{user_id}', response_model=Message, status_code=HTTPStatus.OK
-    )
+    '/users/{user_id}', response_model=Message, status_code=HTTPStatus.OK
+)
 def delete_user_by_id(user_id: int):
     if user_id > len(database) or user_id < 0:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail='User not found'
+            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
         )
 
     del database[user_id]
