@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserBase(BaseModel):
@@ -16,6 +16,7 @@ class UserIn(UserBase):
 class UserOut(UserBase):
     id: int = Field(...)
     created_at: datetime = Field(...)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UsersList(BaseModel):

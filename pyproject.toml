@@ -53,7 +53,8 @@ addopts = ['-p no:warnings', '--cov-report=term-missing']
 [tool.coverage.run]
 source = ['tradefair_system']
 omit = [
-    'tradefair_system/settings.py'
+    'tradefair_system/settings.py',
+    'tradefair_system/database.py'
 ]
 
 

@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+from tradefair_system.schemas.user import UserOut
+
 
 def test_post_user(client):
     response = client.post(
@@ -28,44 +30,62 @@ def test_post_user(client):
     }
 
 
-def test_get_all_users(client):
-    response = client.get('/users/')
-    response_data = response.json()
-
-    for user in response_data.get('users'):
-        assert 'created_at' in user
-        assert 'id' in user
-
-        user.pop('created_at')
-        user.pop('id')
-
-    assert response.status_code == HTTPStatus.OK
-    assert response_data == {
-        'users': [
-            {
-                'name': 'lucas',
-                'phone_number': '61991052451',
-                'email': 'lucassaadro@gmail.com'
-            }
-        ]
-    }
-
-
-def test_put_user_by_id(client):
-    response = client.put(
-        '/users/0',
+def test_post_user_already_exists(client):
+    client.post(
+        '/users/',
         json={
-            'name': 'saad',
+            'name': 'lucas',
             'phone_number': '61991052451',
             'email': 'lucassaadro@gmail.com',
             'password': 'senha'
         },
     )
-    response_data = response.json()
 
+    response = client.post(
+        '/users/',
+        json={
+            'name': 'Saad',
+            'phone_number': '61982785801',
+            'email': 'lucassaadro@gmail.com',
+            'password': 'senha'
+        },
+    )
+
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {
+        'detail': 'Email already exists'
+    }
+
+
+def test_get_all_users_without_user(client):
+    response = client.get('/users/')
     assert response.status_code == HTTPStatus.OK
+    assert response.json() == {'users': []}
+
+
+def test_get_all_users_with_users(client, user):
+    user_schema = UserOut.model_validate(user).model_dump()
+    user_schema['created_at'] = user_schema['created_at'].isoformat()
+    response = client.get('/users/')
+    assert response.json() == {'users': [user_schema]}
+
+
+def test_put_user_by_id(client, user):
+    response = client.put(
+        '/users/1',
+        json={
+            'name': 'saad',
+            'phone_number': '61991052451',
+            'email': 'lucassaadro@gmail.com',
+            'password': 'senha_teste'
+        },
+    )
+    response_data = response.json()
+    assert response.status_code == HTTPStatus.OK
+
     response_data.pop('id')
     response_data.pop('created_at')
+
     assert response_data == {
         'name': 'saad',
         'phone_number': '61991052451',
@@ -75,7 +95,7 @@ def test_put_user_by_id(client):
 
 def test_put_user_by_id_fail(client):
     response = client.put(
-        '/users/999',
+        '/users/1',
         json={
             'name': 'saad',
             'phone_number': '61991052451',
@@ -87,8 +107,36 @@ def test_put_user_by_id_fail(client):
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_delete_user_by_id(client):
-    response = client.delete('/users/0')
+def test_put_integrity_error(client, user):
+    client.post(
+        '/users/',
+        json={
+            'name': 'lucas',
+            'phone_number': '61991052451',
+            'email': 'lucassaadro@gmail.com',
+            'password': 'senha'
+        },
+    )
+    response_update = client.put(
+        f'/users/{user.id}/',
+        json={
+            'name': 'teste',
+            'phone_number': '00000000000',
+            'email': 'lucassaadro@gmail.com',
+            'password': 'psswd'
+        }
+    )
+
+    assert response_update.status_code == HTTPStatus.CONFLICT
+    assert response_update.json() == {
+        'detail': 'Email already exists'
+    }
+
+
+def test_delete_user_by_id(client, user):
+    response = client.delete(
+        f'/users/{user.id}'
+    )
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted'}
