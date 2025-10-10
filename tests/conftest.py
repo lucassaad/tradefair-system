@@ -8,6 +8,7 @@ from tradefair_system.app import app
 from tradefair_system.database import get_session
 from tradefair_system.models.registry import table_registry
 from tradefair_system.models.user import User
+from tradefair_system.security import get_password_hash
 
 
 @pytest.fixture
@@ -30,7 +31,7 @@ def session():
     engine = create_engine(
         'sqlite:///:memory:',
         connect_args={'check_same_thread': False},
-        poolclass=StaticPool
+        poolclass=StaticPool,
     )
     table_registry.metadata.create_all(engine)
 
@@ -47,7 +48,7 @@ def user(session):
         name='Teste',
         phone_number='00000000000',
         email='teste@teste.com',
-        password='senha'
+        password=get_password_hash('senha'),
     )
 
     session.add(user)
@@ -55,3 +56,11 @@ def user(session):
     session.refresh(user)
 
     return user
+
+
+@pytest.fixture
+def token(client, user):
+    response = client.post(
+        '/token', data={'username': user.email, 'password': 'senha'}
+    )
+    return response.json()['access_token']

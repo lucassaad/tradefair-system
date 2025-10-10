@@ -8,7 +8,7 @@ def test_create_user(session):
         name='lucas',
         phone_number='61991052451',
         email='lucassaadro@gmail.com',
-        password='senha'
+        password='senha',
     )
     session.add(new_user)
     session.commit()

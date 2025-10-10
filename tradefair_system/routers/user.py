@@ -9,24 +9,32 @@ from tradefair_system.database import get_session
 from tradefair_system.models.user import User
 from tradefair_system.schemas.message import Message
 from tradefair_system.schemas.user import UserIn, UserOut, UsersList
+from tradefair_system.security import (
+    get_current_user,
+    get_password_hash,
+)
 
 router = APIRouter()
 
 
 @router.post('/users/', response_model=UserOut, status_code=HTTPStatus.CREATED)
 def post_user(user_in: UserIn, session: Session = Depends(get_session)):
-
-    db_user = session.scalar(
-        select(User).where((User.email == user_in.email))
-    )
+    db_user = session.scalar(select(User).where((User.email == user_in.email)))
 
     if db_user is not None:
         raise HTTPException(
-            status_code=HTTPStatus.CONFLICT,
-            detail='Email already exists'
+            status_code=HTTPStatus.CONFLICT, detail='Email already exists'
         )
 
-    db_user = User(**user_in.model_dump())
+    hashed_password = get_password_hash(user_in.password)
+
+    db_user = User(
+        name=user_in.name,
+        phone_number=user_in.phone_number,
+        email=user_in.email,
+        password=hashed_password,
+    )
+
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
@@ -44,48 +52,50 @@ def get_all_users(
 
 
 @router.put(
-        '/users/{user_id}', response_model=UserOut, status_code=HTTPStatus.OK
+    '/users/{user_id}', response_model=UserOut, status_code=HTTPStatus.OK
 )
 def put_user_by_id(
-    user_id: int, user_in: UserIn, session: Session = Depends(get_session)
+    user_id: int,
+    user_in: UserIn,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
-    db_user = session.scalar(select(User).where((User.id == user_id)))
-
-    if db_user is None:
+    if current_user.id != user_id:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
 
     try:
-        db_user.name = user_in.name
-        db_user.email = user_in.email
-        db_user.phone_number = user_in.phone_number
-        db_user.password = user_in.password
+        current_user.name = user_in.name
+        current_user.email = user_in.email
+        current_user.phone_number = user_in.phone_number
+        current_user.password = get_password_hash(user_in.password)
 
         session.commit()
-        session.refresh(db_user)
+        session.refresh(current_user)
 
-        return db_user
+        return current_user
 
     except IntegrityError:
         raise HTTPException(
-            status_code=HTTPStatus.CONFLICT,
-            detail='Email already exists'
+            status_code=HTTPStatus.CONFLICT, detail='Email already exists'
         )
 
 
 @router.delete(
     '/users/{user_id}', response_model=Message, status_code=HTTPStatus.OK
 )
-def delete_user_by_id(user_id: int, session: Session = Depends(get_session)):
-    db_user = session.scalar(select(User).where((User.id == user_id)))
-
-    if db_user is None:
+def delete_user_by_id(
+    user_id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    if current_user.id != user_id:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
 
-    session.delete(db_user)
+    session.delete(current_user)
     session.commit()
 
     return {'message': 'User deleted'}

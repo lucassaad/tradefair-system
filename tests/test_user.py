@@ -10,7 +10,7 @@ def test_post_user(client):
             'name': 'lucas',
             'phone_number': '61991052451',
             'email': 'lucassaadro@gmail.com',
-            'password': 'senha'
+            'password': 'senha',
         },
     )
 
@@ -26,7 +26,7 @@ def test_post_user(client):
     assert response_data == {
         'name': 'lucas',
         'phone_number': '61991052451',
-        'email': 'lucassaadro@gmail.com'
+        'email': 'lucassaadro@gmail.com',
     }
 
 
@@ -37,7 +37,7 @@ def test_post_user_already_exists(client):
             'name': 'lucas',
             'phone_number': '61991052451',
             'email': 'lucassaadro@gmail.com',
-            'password': 'senha'
+            'password': 'senha',
         },
     )
 
@@ -47,14 +47,12 @@ def test_post_user_already_exists(client):
             'name': 'Saad',
             'phone_number': '61982785801',
             'email': 'lucassaadro@gmail.com',
-            'password': 'senha'
+            'password': 'senha',
         },
     )
 
     assert response.status_code == HTTPStatus.CONFLICT
-    assert response.json() == {
-        'detail': 'Email already exists'
-    }
+    assert response.json() == {'detail': 'Email already exists'}
 
 
 def test_get_all_users_without_user(client):
@@ -70,17 +68,19 @@ def test_get_all_users_with_users(client, user):
     assert response.json() == {'users': [user_schema]}
 
 
-def test_put_user_by_id(client, user):
+def test_put_user_by_id(client, user, token):
     response = client.put(
-        '/users/1',
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'name': 'saad',
             'phone_number': '61991052451',
             'email': 'lucassaadro@gmail.com',
-            'password': 'senha_teste'
+            'password': 'senha_teste',
         },
     )
     response_data = response.json()
+
     assert response.status_code == HTTPStatus.OK
 
     response_data.pop('id')
@@ -89,59 +89,62 @@ def test_put_user_by_id(client, user):
     assert response_data == {
         'name': 'saad',
         'phone_number': '61991052451',
-        'email': 'lucassaadro@gmail.com'
+        'email': 'lucassaadro@gmail.com',
     }
 
 
-def test_put_user_by_id_fail(client):
+def test_put_user_by_id_fail(client, user, token):
     response = client.put(
-        '/users/1',
+        '/users/999',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'name': 'saad',
             'phone_number': '61991052451',
             'email': 'lucassaadro@gmail.com',
-            'password': 'senha'
+            'password': 'senha',
         },
     )
 
-    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.status_code == HTTPStatus.FORBIDDEN
 
 
-def test_put_integrity_error(client, user):
+def test_put_integrity_error(client, user, token):
     client.post(
         '/users/',
         json={
             'name': 'lucas',
             'phone_number': '61991052451',
             'email': 'lucassaadro@gmail.com',
-            'password': 'senha'
+            'password': 'senha',
         },
     )
     response_update = client.put(
         f'/users/{user.id}/',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'name': 'teste',
             'phone_number': '00000000000',
             'email': 'lucassaadro@gmail.com',
-            'password': 'psswd'
-        }
+            'password': 'psswd',
+        },
     )
 
     assert response_update.status_code == HTTPStatus.CONFLICT
-    assert response_update.json() == {
-        'detail': 'Email already exists'
-    }
+    assert response_update.json() == {'detail': 'Email already exists'}
 
 
-def test_delete_user_by_id(client, user):
+def test_delete_user_by_id(client, user, token):
     response = client.delete(
-        f'/users/{user.id}'
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_delete_user_by_id_fail(client):
-    response = client.delete('/users/999')
-    assert response.status_code == HTTPStatus.NOT_FOUND
+def test_delete_user_by_id_fail(client, user, token):
+    response = client.delete(
+        '/users/999', headers={'Authorization': f'Bearer {token}'}
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
