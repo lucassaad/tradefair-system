@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -13,13 +14,15 @@ from tradefair_system.security import (
     verify_password,
 )
 
-router = APIRouter()
+router = APIRouter(prefix='/auth', tags=['auth'])
+OAuth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
+db_session = Annotated[Session, Depends(get_session)]
 
 
-@router.post('/token/', response_model=Token, status_code=HTTPStatus.OK)
+@router.post('/token', response_model=Token, status_code=HTTPStatus.OK)
 def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    session: Session = Depends(get_session),
+    form_data: OAuth2Form,
+    session: db_session
 ):
     user = session.scalar(select(User).where(User.email == form_data.username))
 

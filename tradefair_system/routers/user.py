@@ -1,24 +1,27 @@
 from http import HTTPStatus
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from tradefair_system.database import get_session
 from tradefair_system.models.user import User
-from tradefair_system.schemas.message import Message
 from tradefair_system.schemas.user import UserIn, UserOut, UsersList
+from tradefair_system.schemas.utils import FilterPage, Message
 from tradefair_system.security import (
     get_current_user,
     get_password_hash,
 )
 
-router = APIRouter()
+router = APIRouter(prefix='/users', tags=['users'])
+db_session = Annotated[Session, Depends(get_session)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
-@router.post('/users/', response_model=UserOut, status_code=HTTPStatus.CREATED)
-def post_user(user_in: UserIn, session: Session = Depends(get_session)):
+@router.post('/', response_model=UserOut, status_code=HTTPStatus.CREATED)
+def post_user(user_in: UserIn, session: db_session):
     db_user = session.scalar(select(User).where((User.email == user_in.email)))
 
     if db_user is not None:
@@ -42,23 +45,25 @@ def post_user(user_in: UserIn, session: Session = Depends(get_session)):
     return db_user
 
 
-@router.get('/users/', response_model=UsersList, status_code=HTTPStatus.OK)
+@router.get('/', response_model=UsersList, status_code=HTTPStatus.OK)
 def get_all_users(
-    offset: int = 0, limit: int = 100, session: Session = Depends(get_session)
+    session: db_session, filter_user: Annotated[FilterPage, Query()],
 ):
-    users = session.scalars(select(User).offset(offset).limit(limit)).all()
+    users = session.scalars(
+        select(User).offset(filter_user.offset).limit(filter_user.limit)
+    ).all()
 
     return {'users': users}
 
 
 @router.put(
-    '/users/{user_id}', response_model=UserOut, status_code=HTTPStatus.OK
+    '/{user_id}', response_model=UserOut, status_code=HTTPStatus.OK
 )
 def put_user_by_id(
     user_id: int,
     user_in: UserIn,
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user),
+    session: db_session,
+    current_user: CurrentUser,
 ):
     if current_user.id != user_id:
         raise HTTPException(
@@ -83,12 +88,12 @@ def put_user_by_id(
 
 
 @router.delete(
-    '/users/{user_id}', response_model=Message, status_code=HTTPStatus.OK
+    '/{user_id}', response_model=Message, status_code=HTTPStatus.OK
 )
 def delete_user_by_id(
     user_id: int,
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user),
+    session: db_session,
+    current_user: CurrentUser
 ):
     if current_user.id != user_id:
         raise HTTPException(

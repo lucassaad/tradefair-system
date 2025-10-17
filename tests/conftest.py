@@ -61,6 +61,6 @@ def user(session):
 @pytest.fixture
 def token(client, user):
     response = client.post(
-        '/token', data={'username': user.email, 'password': 'senha'}
+        '/auth/token', data={'username': user.email, 'password': 'senha'}
     )
     return response.json()['access_token']
