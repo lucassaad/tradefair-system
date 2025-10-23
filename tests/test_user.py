@@ -1,8 +1,11 @@
 from http import HTTPStatus
 
+import pytest
+
 from tradefair_system.schemas.user import UserOut
 
 
+@pytest.mark.asyncio
 def test_post_user(client):
     response = client.post(
         '/users/',

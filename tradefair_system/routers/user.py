@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from tradefair_system.database import get_session
 from tradefair_system.models.user import User
@@ -16,13 +16,15 @@ from tradefair_system.security import (
 )
 
 router = APIRouter(prefix='/users', tags=['users'])
-db_session = Annotated[Session, Depends(get_session)]
+db_session = Annotated[AsyncSession, Depends(get_session)]
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 @router.post('/', response_model=UserOut, status_code=HTTPStatus.CREATED)
-def post_user(user_in: UserIn, session: db_session):
-    db_user = session.scalar(select(User).where((User.email == user_in.email)))
+async def post_user(user_in: UserIn, session: db_session):
+    db_user = await session.scalar(
+        select(User).where((User.email == user_in.email))
+    )
 
     if db_user is not None:
         raise HTTPException(
@@ -39,19 +41,21 @@ def post_user(user_in: UserIn, session: db_session):
     )
 
     session.add(db_user)
-    session.commit()
-    session.refresh(db_user)
+    await session.commit()
+    await session.refresh(db_user)
 
     return db_user
 
 
 @router.get('/', response_model=UsersList, status_code=HTTPStatus.OK)
-def get_all_users(
+async def get_all_users(
     session: db_session, filter_user: Annotated[FilterPage, Query()],
 ):
-    users = session.scalars(
+    query = await session.scalars(
         select(User).offset(filter_user.offset).limit(filter_user.limit)
-    ).all()
+    )
+
+    users = query.all()
 
     return {'users': users}
 
@@ -59,7 +63,7 @@ def get_all_users(
 @router.put(
     '/{user_id}', response_model=UserOut, status_code=HTTPStatus.OK
 )
-def put_user_by_id(
+async def put_user_by_id(
     user_id: int,
     user_in: UserIn,
     session: db_session,
@@ -76,8 +80,8 @@ def put_user_by_id(
         current_user.phone_number = user_in.phone_number
         current_user.password = get_password_hash(user_in.password)
 
-        session.commit()
-        session.refresh(current_user)
+        await session.commit()
+        await session.refresh(current_user)
 
         return current_user
 
@@ -90,7 +94,7 @@ def put_user_by_id(
 @router.delete(
     '/{user_id}', response_model=Message, status_code=HTTPStatus.OK
 )
-def delete_user_by_id(
+async def delete_user_by_id(
     user_id: int,
     session: db_session,
     current_user: CurrentUser
@@ -100,7 +104,7 @@ def delete_user_by_id(
             status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
 
-    session.delete(current_user)
-    session.commit()
+    await session.delete(current_user)
+    await session.commit()
 
     return {'message': 'User deleted'}
