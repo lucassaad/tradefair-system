@@ -1,3 +1,4 @@
+import factory
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
@@ -26,6 +27,17 @@ def client(session):
     app.dependency_overrides.clear()
 
 
+class UserFactory(factory.Factory):  # define uma fabrica para o modelo User
+    class Meta:  # classe interna usada para configurar a fabrica
+        # define o modelo para o qual a fabrica esta construindo instanciais
+        model = User
+    # a cada chamada da fabrica o valor "n" incrementado instancias diferentes
+    name = factory.Sequence(lambda n: f'test{n}')
+    phone_number = factory.Sequence(lambda n: f'119999999{n:02d}')
+    email = factory.LazyAttribute(lambda obj: f'{obj.name}@test.com')
+    password = factory.LazyAttribute(lambda obj: f'{obj.name}@example.com')
+
+
 @pytest_asyncio.fixture
 async def session():
     engine = create_async_engine(
@@ -46,10 +58,20 @@ async def session():
 
 @pytest_asyncio.fixture
 async def user(session):
-    user = User(
-        name='Teste',
-        phone_number='00000000000',
-        email='teste@teste.com',
+    user = UserFactory(
+        password=get_password_hash('senha'),
+    )
+
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+
+    return user
+
+
+@pytest_asyncio.fixture
+async def other_user(session):
+    user = UserFactory(
         password=get_password_hash('senha'),
     )
 

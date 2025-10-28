@@ -11,12 +11,15 @@ from tradefair_system.models.user import User
 from tradefair_system.schemas.token import Token
 from tradefair_system.security import (
     create_access_token,
+    get_current_user,
     verify_password,
 )
 
 router = APIRouter(prefix='/auth', tags=['auth'])
-OAuth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
+
+currentUser = Annotated[User, Depends(get_current_user)]
 db_session = Annotated[AsyncSession, Depends(get_session)]
+OAuth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
 @router.post('/token', response_model=Token, status_code=HTTPStatus.OK)
@@ -43,3 +46,12 @@ async def login_for_access_token(
     access_token = create_access_token(data={'sub': user.email})
 
     return {'access_token': access_token, 'token_type': 'bearer'}
+
+
+@router.post('/refresh_token', response_model=Token)
+async def refresh_access_token(user: currentUser):
+    new_access_token = create_access_token(
+        data={'sub': user.email}
+    )
+
+    return {'access_token': new_access_token, 'token_type': 'bearer'}

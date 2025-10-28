@@ -1,11 +1,8 @@
 from http import HTTPStatus
 
-import pytest
-
 from tradefair_system.schemas.user import UserOut
 
 
-@pytest.mark.asyncio
 def test_post_user(client):
     response = client.post(
         '/users/',
@@ -151,3 +148,28 @@ def test_delete_user_by_id_fail(client, user, token):
         '/users/999', headers={'Authorization': f'Bearer {token}'}
     )
     assert response.status_code == HTTPStatus.FORBIDDEN
+
+
+def test_update_user_with_wrong_user(client, other_user, token):
+    response = client.put(
+        f'/users/{other_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'name': 'bob',
+            'email': 'bob@mail.com',
+            'phone_number': '61999996666',
+            'password': 'senha',
+
+        }
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permissions'}
+
+
+def test_delete_user_worng_user(client, other_user, token):
+    response = client.delete(
+        f'/users/{other_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permissions'}

@@ -31,7 +31,9 @@ dev = [
     "alembic (>=1.16.5,<2.0.0)",
     "ruff (>=0.13.2,<0.14.0)",
     "taskipy (>=1.14.1,<2.0.0)",
-    "pytest-asyncio (>=1.2.0,<2.0.0)"
+    "pytest-asyncio (>=1.2.0,<2.0.0)",
+    "factory-boy (>=3.3.3,<4.0.0)",
+    "freezegun (>=1.5.5,<2.0.0)"
 ]
 test = [
     "pytest (>=8.4.2,<9.0.0)",
@@ -74,3 +76,8 @@ run = 'fastapi dev tradefair_system/app.py'
 pre_test = 'task lint'
 test = 'pytest -s -x --cov=tradefair_system -vv'
 post_test = 'coverage html'
+
+
+[tool.pyright]
+reportPrivateImportUsage = "none"
+reportIncompatibleVariableOverride = "none"
