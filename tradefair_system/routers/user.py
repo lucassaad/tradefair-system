@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tradefair_system.database import get_session
-from tradefair_system.models.user import User
+from tradefair_system.models import User
 from tradefair_system.schemas.user import UserIn, UserOut, UsersList
 from tradefair_system.schemas.utils import FilterPage, Message
 from tradefair_system.security import (

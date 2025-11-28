@@ -1,8 +1,9 @@
 from datetime import datetime
 
 from sqlalchemy import DateTime, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from tradefair_system.models.product import Product
 from tradefair_system.models.registry import table_registry
 
 
@@ -19,4 +20,10 @@ class User:
     password: Mapped[str] = mapped_column(String(255))
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.now()
+    )
+
+    products: Mapped[list['Product']] = relationship(
+        init=False,
+        cascade='all, delete-orphan',
+        lazy='selectin'
     )

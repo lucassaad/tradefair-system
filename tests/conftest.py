@@ -7,8 +7,7 @@ from sqlalchemy.pool import StaticPool
 
 from tradefair_system.app import app
 from tradefair_system.database import get_session
-from tradefair_system.models.registry import table_registry
-from tradefair_system.models.user import User
+from tradefair_system.models import User, table_registry
 from tradefair_system.security import get_password_hash
 
 

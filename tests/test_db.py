@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy import select
 
-from tradefair_system.models.user import User
+from tradefair_system.models import Product, User
 
 
 @pytest.mark.asyncio
@@ -23,3 +23,14 @@ async def test_create_user(session):
     assert user.name == 'lucas'
     assert user.email == 'lucassaadro@gmail.com'
     assert user.phone_number == '61991052451'
+
+
+@pytest.mark.asyncio
+async def test_create_product(session, user):
+    product = Product(
+        name='teste',
+        description='nodescription',
+        price=70.0,
+        quantity=7.0,
+        user_id=user.id
+    )

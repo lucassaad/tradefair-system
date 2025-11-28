@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tradefair_system.database import get_session
-from tradefair_system.models.user import User
+from tradefair_system.models import User
 from tradefair_system.schemas.token import Token
 from tradefair_system.security import (
     create_access_token,
